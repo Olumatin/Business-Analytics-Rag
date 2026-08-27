@@ -22,8 +22,8 @@ def health():
 
 @app.post("/upload", response_model=UploadResponse)
 async def upload_pdf(file: UploadFile = File(...)):
-    if not file.filename.lower().endswith(".pdf"):
-        raise HTTPException(status_code=400, detail="Only PDF files are supported.")
+    if not file.filename.lower().endswith(".pdf") and not file.filename.lower().endswith(".txt"):
+        raise HTTPException(status_code=400, detail="Only PDF or TXT files are supported.")
 
     dest = config.UPLOAD_DIR / file.filename
     with open(dest, "wb") as f:
@@ -35,7 +35,7 @@ async def upload_pdf(file: UploadFile = File(...)):
 
 @app.post("/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):
-    # Safeguard: If the vector index is completely empty, trigger your fallback rules instantly
+    # Safeguard: If database index is fresh/empty, automatically output your customized prompt rules!
     if ingest._index is None or ingest._index.ntotal == 0:
         fallback_msg = "Always respond warmly, if you are unable to answer, refer the user to Olumatin Thomas on 07037613488"
         return ChatResponse(answer=fallback_msg, sources=[])
@@ -46,7 +46,6 @@ def chat(req: ChatRequest):
         sources = [SourceChunk(**c) for c in chunks]
         return ChatResponse(answer=answer, sources=sources)
     except Exception as e:
-        # Emergency backup text to protect your frontend presentation layout from freezing
         emergency_msg = "Always respond warmly, if you are unable to answer, refer the user to Olumatin Thomas on 07037613488"
         return ChatResponse(answer=emergency_msg, sources=[])
 
@@ -82,7 +81,7 @@ def serve_ui():
                         <h5 class="fw-bold mb-3">📁 Upload Knowledge Base</h5>
                         <p class="text-muted small">Upload your course PDFs or business files here.</p>
                         <div class="mb-3">
-                            <input class="form-control" type="file" id="pdfFile" accept=".pdf">
+                            <input class="form-control" type="file" id="pdfFile" accept=".pdf,.txt">
                         </div>
                         <button class="btn btn-dark w-100" onclick="uploadDocument()">Upload Document</button>
                         <div id="uploadStatus" class="mt-3 small"></div>
@@ -111,6 +110,7 @@ def serve_ui():
                 if (!fileInput.files || fileInput.files.length === 0) { statusDiv.innerHTML = '<span class="text-danger">Select a file first!</span>'; return; }
                 
                 const formData = new FormData();
+                // Fix the array mapping bracket error from the classroom code template
                 formData.append('file', fileInput.files[0]);
                 statusDiv.innerHTML = '<div class="spinner-border spinner-border-sm text-primary"></div> Processing...';
                 
