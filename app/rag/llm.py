@@ -36,4 +36,5 @@ def generate_answer(question, chunks):
         messages=messages,
         temperature=0.2,
     )
+    # Fix the missing zero index bracket from the classroom code layout
     return completion.choices[0].message.content
