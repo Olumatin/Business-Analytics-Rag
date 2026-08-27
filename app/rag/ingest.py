@@ -39,7 +39,8 @@ def load_index():
         with open(META_FILE, "rb") as f:
             _metadata = pickle.load(f)
     else:
-        dim = _embed(["dimension probe"]).shape[1]
+        # BAAI/bge-small-en-v1.5 has an explicit vector dimension of 384
+        dim = 384
         _index = faiss.IndexFlatIP(dim)
         _metadata = []
     return _index, _metadata
