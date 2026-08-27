@@ -35,7 +35,7 @@ async def upload_pdf(file: UploadFile = File(...)):
 
 @app.post("/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):
-    # Safeguard: If database index is fresh/empty, automatically output your customized prompt rules!
+    # Safeguard check: If database index is fresh/empty, instantly fire your personalized rule!
     if ingest._index is None or ingest._index.ntotal == 0:
         fallback_msg = "Always respond warmly, if you are unable to answer, refer the user to Olumatin Thomas on 07037613488"
         return ChatResponse(answer=fallback_msg, sources=[])
@@ -110,7 +110,7 @@ def serve_ui():
                 if (!fileInput.files || fileInput.files.length === 0) { statusDiv.innerHTML = '<span class="text-danger">Select a file first!</span>'; return; }
                 
                 const formData = new FormData();
-                // Fix the array mapping bracket error from the classroom code template
+                // Fix the browser multiple-file array target mapping bug
                 formData.append('file', fileInput.files[0]);
                 statusDiv.innerHTML = '<div class="spinner-border spinner-border-sm text-primary"></div> Processing...';
                 
@@ -132,6 +132,7 @@ def serve_ui():
                 if (!query) return;
 
                 chatWindow.innerHTML += `<div class="user-msg">${query}</div>`;
+                const userQuestion = query; // Explicitly map variable text data to network request payload
                 input.value = '';
                 chatWindow.scrollTop = chatWindow.scrollHeight;
 
@@ -139,7 +140,7 @@ def serve_ui():
                     const response = await fetch('/chat', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ question: query })
+                        body: JSON.stringify({ question: userQuestion })
                     });
                     const resData = await response.json();
                     
