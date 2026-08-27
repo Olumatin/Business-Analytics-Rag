@@ -35,10 +35,20 @@ async def upload_pdf(file: UploadFile = File(...)):
 
 @app.post("/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):
-    chunks = retriever.search(req.question, req.top_k)
-    answer = llm.generate_answer(req.question, chunks)
-    sources = [SourceChunk(**c) for c in chunks]
-    return ChatResponse(answer=answer, sources=sources)
+    # Safeguard: If the vector index is completely empty, trigger your fallback rules instantly
+    if ingest._index is None or ingest._index.ntotal == 0:
+        fallback_msg = "Always respond warmly, if you are unable to answer, refer the user to Olumatin Thomas on 07037613488"
+        return ChatResponse(answer=fallback_msg, sources=[])
+        
+    try:
+        chunks = retriever.search(req.question, req.top_k)
+        answer = llm.generate_answer(req.question, chunks)
+        sources = [SourceChunk(**c) for c in chunks]
+        return ChatResponse(answer=answer, sources=sources)
+    except Exception as e:
+        # Emergency backup text to protect your frontend presentation layout from freezing
+        emergency_msg = "Always respond warmly, if you are unable to answer, refer the user to Olumatin Thomas on 07037613488"
+        return ChatResponse(answer=emergency_msg, sources=[])
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -98,7 +108,7 @@ def serve_ui():
             async function uploadDocument() {
                 const fileInput = document.getElementById('pdfFile');
                 const statusDiv = document.getElementById('uploadStatus');
-                if (!fileInput.files[0]) { statusDiv.innerHTML = '<span class="text-danger">Select a file first!</span>'; return; }
+                if (!fileInput.files || fileInput.files.length === 0) { statusDiv.innerHTML = '<span class="text-danger">Select a file first!</span>'; return; }
                 
                 const formData = new FormData();
                 formData.append('file', fileInput.files[0]);
