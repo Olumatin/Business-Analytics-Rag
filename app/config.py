@@ -4,7 +4,8 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+# Fix the broken class model by switching to a standard, active Groq model
+GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 
 # fastembed model, ONNX-runtime based (no PyTorch) -> low RAM footprint.
 # BAAI/bge-small-en-v1.5: 384-dim, ~130MB on disk, strong quality for its size.
@@ -24,6 +25,5 @@ INDEX_DIR.mkdir(parents=True, exist_ok=True)
 
 if not GROQ_API_KEY:
     raise RuntimeError(
-        "GROQ_API_KEY is not set. Add it as an environment variable "
-        "(Railway: Project -> Variables -> GROQ_API_KEY)."
+        "GROQ_API_KEY is not set. Add it as an environment variable."
     )
