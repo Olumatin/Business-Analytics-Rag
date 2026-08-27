@@ -1,0 +1,9 @@
+fastapi==0.110.0
+uvicorn==0.28.0
+groq==0.4.2
+pypdf==4.1.0
+fastembed==0.2.2
+faiss-cpu==1.8.0
+python-multipart==0.0.9
+pydantic==2.6.4
+numpy==1.26.4
