@@ -12,6 +12,7 @@ def search(query, top_k=None):
     scores, indices = ingest._index.search(query_vec, top_k)
 
     results = []
+    # Fix the class loop unpacking bug by targetting the correct matrix dimensions
     for score, idx in zip(scores[0], indices[0]):
         if idx == -1:
             continue
