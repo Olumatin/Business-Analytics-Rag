@@ -35,7 +35,7 @@ async def upload_pdf(file: UploadFile = File(...)):
 
 @app.post("/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):
-    # Safeguard check: If database index is fresh/empty, instantly fire your personalized rule!
+    # Safeguard check: If the database table is clean and empty, immediately trigger your text rule layout!
     if ingest._index is None or ingest._index.ntotal == 0:
         fallback_msg = "Always respond warmly, if you are unable to answer, refer the user to Olumatin Thomas on 07037613488"
         return ChatResponse(answer=fallback_msg, sources=[])
@@ -110,7 +110,7 @@ def serve_ui():
                 if (!fileInput.files || fileInput.files.length === 0) { statusDiv.innerHTML = '<span class="text-danger">Select a file first!</span>'; return; }
                 
                 const formData = new FormData();
-                // Fix the browser multiple-file array target mapping bug
+                // Fix the array mapping bracket error from the classroom code template
                 formData.append('file', fileInput.files[0]);
                 statusDiv.innerHTML = '<div class="spinner-border spinner-border-sm text-primary"></div> Processing...';
                 
@@ -132,7 +132,7 @@ def serve_ui():
                 if (!query) return;
 
                 chatWindow.innerHTML += `<div class="user-msg">${query}</div>`;
-                const userQuestion = query; // Explicitly map variable text data to network request payload
+                const userQuestion = query;
                 input.value = '';
                 chatWindow.scrollTop = chatWindow.scrollHeight;
 
